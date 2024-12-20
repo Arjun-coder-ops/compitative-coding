@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX 100
+
+typedef struct Stack {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack* stack) {
+    stack->top = -1;
+}
+
+int isFull(Stack* stack) {
+    return stack->top == MAX - 1;
+}
+
+int isEmpty(Stack* stack) {
+    return stack->top == -1;
+}
+
+void push(Stack* stack, int value) {
+    if (isFull(stack)) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack->arr[++stack->top] = value;
+}
+
+int pop(Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack Underflow\n");
+        return INT_MIN;
+    }
+    return stack->arr[stack->top--];
+}
+
+int peek(Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack is Empty\n");
+        return INT_MIN;
+    }
+    return stack->arr[stack->top];
+}
+
+typedef struct MinStack {
+    Stack mainStack;
+    Stack minStack;
+} MinStack;
+
+void initMinStack(MinStack* minStack) {
+    initStack(&minStack->mainStack);
+    initStack(&minStack->minStack);
+}
+
+void pushMinStack(MinStack* minStack, int value) {
+    push(&minStack->mainStack, value);
+    if (isEmpty(&minStack->minStack) || value <= peek(&minStack->minStack)) {
+        push(&minStack->minStack, value);
+    }
+}
+
+int popMinStack(MinStack* minStack) {
+    int value = pop(&minStack->mainStack);
+    if (value == peek(&minStack->minStack)) {
+        pop(&minStack->minStack);
+    }
+    return value;
+}
+
+int getMinimum(MinStack* minStack) {
+    return peek(&minStack->minStack);
+}
+
+int main() {
+    MinStack minStack;
+    initMinStack(&minStack);
+
+    pushMinStack(&minStack, 10);
+    pushMinStack(&minStack, 20);
+    pushMinStack(&minStack, 5);
+    pushMinStack(&minStack, 15);
+
+    printf("Current Minimum: %d\n", getMinimum(&minStack)); // Output: 5
+
+    popMinStack(&minStack);
+    printf("Current Minimum: %d\n", getMinimum(&minStack)); // Output: 5
+
+    popMinStack(&minStack);
+    printf("Current Minimum: %d\n", getMinimum(&minStack)); // Output: 10
+
+    return 0;
+}
